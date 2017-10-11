@@ -28,9 +28,9 @@ private:
 };
 
 // 导出函数声明
-EXPORT_DEF(CApkGeneral)
-{
-    return (void*)(new CApkGeneral);
-}
+//EXPORT_DEF(CApkGeneral)
+//{
+//    return (void*)(new CApkGeneral);
+//}
 
 #endif // APH_HIJACK_H

@@ -133,7 +133,7 @@
 			<subparam name="3" name1 ="3" attributes = "1" valueneed = "0" depend = "-gdllpath" default="0" desc="apk包加密" />
 			<subparam name="4" name1 ="4" attributes = "1" valueneed = "0" depend = "-gdllpath" default="0" desc="更新包dll加密" />
 		</param>
-		<param name="-gdllpath" name1 ="-dllname" attributes = "1" valueneed = "1" default="0" desc="配合-gdll参数指明dll配置路径" />
+		<param name="-gdllpath" name1 ="-dllnames" attributes = "1" valueneed = "1" default="0" desc="配合-gdll参数指明dll配置路径" />
 	</module>
 	<module id="999" name="拆包工具" symbol="ModifyDex" type="2" available="1" toolname="module\Modifydex\IJMModifydex" version="5.0.1" check="ENCRYPTION SUCCESS" help=""  >
 		<param name="-fifi" name1 ="-f" attributes = "1" valueneed = "1" default="0" desc="输入apk文件" />

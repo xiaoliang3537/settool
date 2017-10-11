@@ -175,6 +175,7 @@ protected:
     // 检查程序运行结果
     int checkOutPut(string &strOut, string su = "SUCESS");
 protected:
+    bool                                        m_bDecompressAll;           //
     int                                         m_iProgramId;               // 模块ID
     CPubVar*                                    m_pubvar;                   // 系统公共变量
     CConfig*                                    m_config;                   // 配置信息

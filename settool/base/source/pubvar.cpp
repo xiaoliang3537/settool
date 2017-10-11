@@ -7,6 +7,7 @@
 #include <Windows.h>
 #else
 #include <time.h>
+#include <limits.h>
 #endif
 
 int g_outinfo = 1;
@@ -53,29 +54,35 @@ std::string CPubVar::getWorkPath()
 {
     if(m_strWorkPath.length() == 0 )
     {
-#ifdef WIN32
+#ifdef I_OS_WINDOWS
         TCHAR szPath[MAX_PATH];
         if( !GetModuleFileName(NULL,szPath,MAX_PATH) )
         {
             printf("GetModuleFileName failed (%d)\n", GetLastError());
             return "";
         }
-
-//        int iLen = WideCharToMultiByte(CP_ACP, 0,szPath, -1, NULL, 0, NULL, NULL);
-//        char* chRtn =new char[iLen*sizeof(char)];
-//        WideCharToMultiByte(CP_ACP, 0, szPath, -1, chRtn, iLen, NULL, NULL);
-//        m_strWorkPath = chRtn;
-//        delete [] chRtn;
         m_strWorkPath = szPath;
         m_strWorkPath = FileUtils::ExtractFileDir(m_strWorkPath);
 #else
-        char current_absolute_path[260];
-        if (NULL == realpath("./", current_absolute_path))
+        LOG(INFO) << "load readlink info" << endl;
+        char current_absolute_path[PATH_MAX] = {0};
+        int cnt = readlink("/proc/self/exe", current_absolute_path, PATH_MAX);
+        if (cnt < 0 || cnt >= PATH_MAX)
         {
             LOG(ERROR) << "get path fail" << endl;
             exit(-1);
         }
+        int i;
+        for (i = cnt; i >= 0; --i)
+        {
+            if (current_absolute_path[i] == '/')
+            {
+                current_absolute_path[i] = '\0';
+                break;
+            }
+        }
         m_strWorkPath = current_absolute_path;
+        LOG(INFO) << "path = " << m_strWorkPath << endl;
 #endif
     }
     return m_strWorkPath;

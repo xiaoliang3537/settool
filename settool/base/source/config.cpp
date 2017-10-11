@@ -57,6 +57,7 @@ int CConfig::loadConfig()
     CMarkup objXml;
     do
     {
+        LOG(INFO) << strConfigPath << endl;
         if(!objXml.Load(strConfigPath.c_str()))
         {
             LOG(ERROR) << "load xml fail" << endl;
@@ -261,7 +262,7 @@ int CConfig::showHelp()
                     for(; sub != param->listSubParam.end(); sub++ )
                     {
                         ST_Module_Param_Sub* subParam = *sub;
-                        cout << setw(10) << subParam->strParamName << "  " << subParam->strParamDesc.c_str() << endl;
+                        cout << setw(10) << subParam->strParamName << "      " << subParam->strParamDesc.c_str() << endl;
                     }
                 }
 #endif

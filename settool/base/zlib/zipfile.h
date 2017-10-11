@@ -19,7 +19,7 @@
 
 #include <stddef.h>
 #include "private.h"
-#include "zip.h"
+#include"zip.h"
 #include <string>
 #include <vector>
 
@@ -249,7 +249,7 @@ EXPORT int AddFileToZipEx(int count, const char* strSrcFile, const char* strZipP
  *  @param zipFilePack zip文件
  *  @return 0 正常 !0失败
  * */
-EXPORT int AddDirToZip(const char* strSrcDirPath, const char* strZipPath, const char* zipFilePack);
+EXPORT int AddDirToZip(const char* strSrcDirPath, const char* strZipPath, const char* zipFilePack, bool bNewZip = false);
 
 /** @brief 创建压缩文件
  * */

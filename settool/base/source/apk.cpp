@@ -10,6 +10,7 @@
 
 CApk::CApk()
 {
+    m_bDecompressAll = false;
     m_pubvar = NULL;
     m_iProcessRet = -1;
     m_iProgramId = 0;
@@ -321,87 +322,93 @@ int CApk::backPack()
     int iRet = 0;
     // 检查需要回包的文件是否正常
     list<ST_FIleAddInfo>::iterator iter = m_listStAddFile.begin();
-    // 删除原来的文件
-    for(; iter != m_listStAddFile.end(); iter++)
-    {
-        ST_FIleAddInfo info = *iter;
-        if(0 != access(info.strFilePath.c_str(), 0 ) )
-        {
-            LOG(ERROR) << "file not exsit [" << info.strFilePath <<"]" << endl;
-            return -1;
-        }
-    }
-
     // 保留原包
     if(m_strTempApkPath.length() == 0 )
     {
         m_strTempApkPath.append(FileUtils::ExtractFileRemoveExt(m_strApkPath)).append(m_strTempFilaName).append("_New.zip");
-#ifdef _DEBUG
         LOG(INFO) << "temp apk path=" << m_strTempApkPath << endl;
-#endif
-    }
-    if(!FileUtils::copyFile((char*)m_strApkPath.c_str(), (char*)m_strTempApkPath.c_str(), true) )
-    {
-        LOG(INFO) << "copyFile apk fail = " << m_strTempApkPath << endl;
     }
 
-    iter = m_listStAddFile.begin();
-    string strFileList;
-    // 删除原来的文件
-    for(; iter != m_listStAddFile.end(); iter++)
+    if( !m_bDecompressAll )
     {
-        ST_FIleAddInfo info = *iter;
-        strFileList += info.strPathInZip +";";
-    }
-
-    // 删除用户指定的文件
-    list<ST_FIleAddInfo>::iterator iter1 = m_listStDeleteFile.begin();
-    for(; iter1 != m_listStDeleteFile.end(); iter1++)
-    {
-        ST_FIleAddInfo info = *iter1;
-        strFileList += info.strPathInZip +";";
-    }
-
-    //
-    if(m_stTaskInfo->strListParamCommon.length() > 0)
-    {
-        if (0 <= m_stTaskInfo->strListParamCommon.findIndex("-d") )
+        // 删除原来的文件
+        for(; iter != m_listStAddFile.end(); iter++)
         {
-            strFileList += "META-INF/*.SF;META-INF/*.RSA;META-INF/*.MF;";
-        }
-    }
-
-
-    strFileList = strFileList.substr(0, strFileList.length()-1 );
-
-#ifdef _DEBUG
-    LOG(INFO) << "delete file list: " << strFileList << endl;
-#endif
-
-    iRet = deleteFileInApkEx(m_strTempApkPath.c_str(),strFileList.c_str() );
-    if( iRet != 1 )
-    {
-        LOG(INFO) << "delete file failure !" << endl;
-        iRet = -2;
-        return iRet;
-    }
-
-    // 删除文件夹
-    if(m_listStDecompressDir.size() > 0 )
-    {
-        list<ST_FIleAddInfo>::iterator iter2 = m_listStDecompressDir.begin();
-        for(; iter2 != m_listStDecompressDir.end(); iter2++ )
-        {
-            ST_FIleAddInfo info = *iter2;
-            iRet = DeleteInZipFileEx(m_strTempApkPath.c_str(), info.strPathInZip.c_str(), true );
-            if(1 != iRet )
+            ST_FIleAddInfo info = *iter;
+            if(0 != access(info.strFilePath.c_str(), 0 ) )
             {
-                LOG(ERROR) << "delete file failure [" << info.strFilePath << "]" << endl;
-                iRet = -2;
-                return iRet;
+                LOG(ERROR) << "file not exsit [" << info.strFilePath <<"]" << endl;
+                return -1;
+            }
+        }
+
+        if(!FileUtils::copyFile((char*)m_strApkPath.c_str(), (char*)m_strTempApkPath.c_str(), true) )
+        {
+            LOG(INFO) << "copyFile apk fail ,errno = [" << errno << "] " << m_strTempApkPath << endl;
+        }
+
+        iter = m_listStAddFile.begin();
+        string strFileList;
+        // 删除原来的文件
+        for(; iter != m_listStAddFile.end(); iter++)
+        {
+            ST_FIleAddInfo info = *iter;
+            strFileList += info.strPathInZip +";";
+        }
+
+        // 删除用户指定的文件
+        list<ST_FIleAddInfo>::iterator iter1 = m_listStDeleteFile.begin();
+        for(; iter1 != m_listStDeleteFile.end(); iter1++)
+        {
+            ST_FIleAddInfo info = *iter1;
+            strFileList += info.strPathInZip +";";
+        }
+
+        //
+        if(m_stTaskInfo->strListParamCommon.length() > 0)
+        {
+            if (0 <= m_stTaskInfo->strListParamCommon.findIndex("-d") )
+            {
+                strFileList += "META-INF/*.SF;META-INF/*.RSA;META-INF/*.MF;";
+            }
+        }
+
+
+        strFileList = strFileList.substr(0, strFileList.length()-1 );
+
+    #ifdef _DEBUG
+        LOG(INFO) << "delete file list: " << strFileList << endl;
+    #endif
+
+        iRet = deleteFileInApkEx(m_strTempApkPath.c_str(),strFileList.c_str() );
+        if( iRet != 1 )
+        {
+            LOG(INFO) << "delete file failure !" << endl;
+            iRet = -2;
+            return iRet;
+        }
+
+        // 删除文件夹
+        if(m_listStDecompressDir.size() > 0 )
+        {
+            list<ST_FIleAddInfo>::iterator iter2 = m_listStDecompressDir.begin();
+            for(; iter2 != m_listStDecompressDir.end(); iter2++ )
+            {
+                ST_FIleAddInfo info = *iter2;
+                iRet = DeleteInZipFileEx(m_strTempApkPath.c_str(), info.strPathInZip.c_str(), true );
+                if(1 != iRet )
+                {
+                    LOG(ERROR) << "delete file failure [" << info.strFilePath << "]" << endl;
+                    iRet = -2;
+                    return iRet;
+                }
             }
         }
     }
+
+    bool bCreate = false;
+    if(m_bDecompressAll)
+        bCreate = true;
 
     iRet = 0;
     iter = m_listStAddFile.begin();
@@ -412,7 +419,9 @@ int CApk::backPack()
 #ifdef _DEBUG
     LOG(INFO) << "add file to apk: " << info.strFilePath << "->" << info.strPathInZip << endl;
 #endif
-        iRet = addDataOrFileToZip(m_strTempApkPath.c_str(), info.strPathInZip.c_str(), info.strFilePath.c_str(), 0, false);
+        iRet = addDataOrFileToZip(m_strTempApkPath.c_str(), info.strPathInZip.c_str(), info.strFilePath.c_str(), 0, bCreate );
+        bCreate = false;
+
         if(1 != iRet )
         {
             // 压缩出错
@@ -431,7 +440,8 @@ int CApk::backPack()
 #ifdef _DEBUG
             LOG(INFO) << "add dir to apk: " << info.strFilePath << "->" << info.strPathInZip << endl;
 #endif
-            iRet = AddDirToZip(info.strFilePath.c_str(), info.strPathInZip.c_str(), m_strTempApkPath.c_str() );
+            iRet = AddDirToZip(info.strFilePath.c_str(), info.strPathInZip.c_str(), m_strTempApkPath.c_str() ,bCreate);
+            bCreate = false;
             if(1 != iRet )
             {
                 LOG(ERROR) << "compress file failure ! [" << info.strFilePath << "]" << endl;
@@ -452,70 +462,109 @@ int CApk::zipDeCompress()
 {
     int iRet = 0;
 
-    vector<char*> vecDecFiles;
-    std::string strFileList;
-    list<ST_FIleAddInfo>::iterator iter = m_listStDecompressFile.begin();
-    for(; iter != m_listStDecompressFile.end(); iter++ )
+    // 解压全部
+    if(m_bDecompressAll)
     {
-        ST_FIleAddInfo info = *iter;
-        strFileList += info.strPathInZip + ";";
-        vecDecFiles.push_back((char*)info.strPathInZip.c_str());
-    }
-    strFileList = strFileList.substr(0,strFileList.length()-1);
-
-    LOG(INFO) << "save path:" << m_strTempPath << endl;
-#ifdef _DEBUG
-    LOG(INFO) << "decompress file:" << strFileList << endl;
-#endif
-    // 解压文件
-    iRet = DecompressionFilesEx(m_listStDecompressFile.size(), strFileList.c_str(), m_strTempPath.c_str(), m_strApkPath.c_str(), true);
-    if(1 != iRet )
-    {
-        // 解压文件失败
-        LOG(ERROR) << "Decompress file failure [" << strFileList << "]" << endl;
-        iRet = -3;
-        return iRet;
-    }
-    iRet = 0;
-    // 解压文件夹
-    if( m_listStDecompressDir.size() > 0 )
-    {
-        list<ST_FIleAddInfo>::iterator iterT = m_listStDecompressDir.begin();
-        for(; iterT != m_listStDecompressDir.end(); iterT++ )
+        iRet = DecompressionZip(m_strTempPath.c_str(), m_strApkPath.c_str() );
+        if(1 != iRet )
         {
-            ST_FIleAddInfo info = *iterT;
-            iRet = DecompressionDir( m_strApkPath.c_str(), m_strTempPath.c_str(), info.strPathInZip.c_str() );
-            if(1 != iRet )
+            // 解压文件失败
+            LOG(ERROR) << "Decompress all file failure !" << endl;
+            iRet = -3;
+            return iRet;
+        }
+
+        iRet = 0;
+        // 检查是否包含 dex文件
+        std::vector<std::string> vecFiles;
+        FileUtils::GetAllFilesEntry(m_strTempPath, vecFiles);
+        std::vector<std::string>::iterator iterD = vecFiles.begin();
+        for(; iterD != vecFiles.end(); iterD++ )
+        {
+            string strFile = (*iterD);
+            strFile = strFile.substr();
+            if( strFile.length() <= 4 )
             {
-                iRet = -3;
-                LOG(ERROR) << "Decompress file failure [" << info.strPathInZip << "]" << endl;
-                return iRet;
+                continue;
+            }
+
+            if( strFile.compare(strFile.length() - 4, 4, ".dex") == 0 )
+            {
+                m_strListDex.append(strFile);
+#ifdef _DEBUG
+                LOG(INFO) << strFile << endl;
+#endif
+            }
+        }
+    }
+    else
+    {
+        vector<char*> vecDecFiles;
+        std::string strFileList;
+        list<ST_FIleAddInfo>::iterator iter = m_listStDecompressFile.begin();
+        for(; iter != m_listStDecompressFile.end(); iter++ )
+        {
+            ST_FIleAddInfo info = *iter;
+            strFileList += info.strPathInZip + ";";
+            vecDecFiles.push_back((char*)info.strPathInZip.c_str());
+        }
+        strFileList = strFileList.substr(0,strFileList.length()-1);
+
+        LOG(INFO) << "save path:" << m_strTempPath << endl;
+#ifdef _DEBUG
+        LOG(INFO) << "decompress file:" << strFileList << endl;
+#endif
+        // 解压文件
+        iRet = DecompressionFilesEx(m_listStDecompressFile.size(), strFileList.c_str(), m_strTempPath.c_str(), m_strApkPath.c_str(), true);
+        if(1 != iRet )
+        {
+            // 解压文件失败
+            LOG(ERROR) << "Decompress file failure [" << strFileList << "]" << endl;
+            iRet = -3;
+            return iRet;
+        }
+        iRet = 0;
+        // 解压文件夹
+        if( m_listStDecompressDir.size() > 0 )
+        {
+            list<ST_FIleAddInfo>::iterator iterT = m_listStDecompressDir.begin();
+            for(; iterT != m_listStDecompressDir.end(); iterT++ )
+            {
+                ST_FIleAddInfo info = *iterT;
+                iRet = DecompressionDir( m_strApkPath.c_str(), m_strTempPath.c_str(), info.strPathInZip.c_str() );
+                if(1 != iRet )
+                {
+                    iRet = -3;
+                    LOG(ERROR) << "Decompress file failure [" << info.strPathInZip << "]" << endl;
+                    return iRet;
+                }
+            }
+        }
+
+        iRet = 0;
+        // 检查是否包含 dex文件
+        std::vector<std::string> vecFiles;
+        FileUtils::GetAllFilesEntry(m_strTempPath, vecFiles);
+        std::vector<std::string>::iterator iterD = vecFiles.begin();
+        for(; iterD != vecFiles.end(); iterD++ )
+        {
+            string strFile = (*iterD);
+            strFile = strFile.substr();
+            if( strFile.length() <= 4 )
+            {
+                continue;
+            }
+
+            if( strFile.compare(strFile.length() - 4, 4, ".dex") == 0 )
+            {
+                m_strListDex.append(strFile);
+#ifdef _DEBUG
+                LOG(INFO) << strFile << endl;
+#endif
             }
         }
     }
 
-    iRet = 0;
-    // 检查是否包含 dex文件
-    std::vector<std::string> vecFiles;
-    FileUtils::GetAllFilesEntry(m_strTempPath, vecFiles);
-    std::vector<std::string>::iterator iterD = vecFiles.begin();
-    for(; iterD != vecFiles.end(); iterD++ )
-    {
-        string strFile = (*iterD);
-        strFile = strFile.substr();
-        if( strFile.length() <= 4 )
-        {
-            continue;
-        }
-
-        if( strFile.compare(strFile.length() - 4, 4, ".dex") == 0 )
-        {
-            m_strListDex.append(strFile);
-#ifdef _DEBUG
-            LOG(INFO) << strFile << endl;
-#endif
-        }
-    }
 
     return iRet;
 }

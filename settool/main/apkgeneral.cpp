@@ -27,7 +27,7 @@ int CApkGeneral::initTask(ST_Task_Info* stTaskInfo, CPubVar* pubvar)
     }
     // 设置解压文件
     setDecompressFile("","classes*.dex");
-    setDecompressFile("test","AndroidManifest.xml");
+    setDecompressFile("","AndroidManifest.xml");
 
     std::list<ST_Param_Module*>::iterator it = m_stTaskInfo->listParamModule.begin();
     for(; it != m_stTaskInfo->listParamModule.end(); it++ )
@@ -37,6 +37,13 @@ int CApkGeneral::initTask(ST_Task_Info* stTaskInfo, CPubVar* pubvar)
         {
             setDecompressDir("", "assets" );
             setDecompressDir("", "lib" );
+
+            // 更新包 加密部分
+            if(1)
+            {
+                m_bDecompressAll = true;
+            }
+
             break;
         }
     }
@@ -217,16 +224,17 @@ int CApkGeneral::setBackInfo()
                 continue;
 
             // 如果匹配到class文件夹 则为需要进行回编的dex文件， 否则为待压缩文件
-            if( NULL != strstr(info->d_name, "classes") )
+            if( NULL != strstr(info->d_name, "smali") )
             {
                 std::string p;
                 std::string strFilePath;
                 std::string strFileName;
-                strFilePath.append(m_strTempPath).append(_SYMBOL_PATH_).append(info->d_name).append( ".dex" );
-                strFileName.append(info->d_name).append(".dex");
+                std::string strDexFileName = m_mapSmaliToDex[info->d_name];
+                strFilePath.append(m_strTempPath).append(_SYMBOL_PATH_).append(strDexFileName );
+                strFileName.append(strDexFileName);
 
                 setBackSmaliFile(p.assign(m_strTempPath).append(_SYMBOL_PATH_).append(info->d_name), strFilePath );
-                setAddFile( p.assign(m_strTempPath).append(_SYMBOL_PATH_).append(info->d_name)+".dex", strFileName);
+                setAddFile( p.assign(m_strTempPath).append(_SYMBOL_PATH_).append(strDexFileName), strFileName);
             }
             else
             {

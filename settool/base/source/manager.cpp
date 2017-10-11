@@ -107,7 +107,7 @@ int CManager::execCmd(int argc, char* argv[])
                 }
                 // 特别参数
                 strListParam.append(argv[i]);
-                continue;
+                break;
             }
             ST_Module* module = config->getModuleInfo(stParam->iModuleId);
             if(NULL == module )
@@ -198,7 +198,7 @@ int CManager::execCmd(int argc, char* argv[])
                         }
                         if( CPubfunc::checkIsParam(argv[i+2]) )
                         {
-                            LOG(ERROR) << CPubfunc::KS_UTF8_to_ANSI(stParam->strParamName.c_str()) << tr(" cannot find value") << endl;
+                            LOG(ERROR) << stParam->strParamName << tr(" cannot find value") << endl;
                             delete subParam;
                             return -1;
                         }
@@ -263,17 +263,23 @@ int CManager::execCmd(int argc, char* argv[])
         if(module->iType == 1)
         {
             strCmd = "java -jar \"" + CPubVar::GetInstance().getModulePath(module->iModuleID) + "\" " + param->strParamNameL + " \"" + strApkPath + "\" " ;
+#ifdef _DEBUG
             LOG(INFO) << "path =>" << CPubVar::GetInstance().getWorkPath().c_str() << endl;
+#endif
         }
         else if(module->iType == 2)
         {
+#ifdef I_OS_WINDOWS
             strCmd = "\"" + CPubVar::GetInstance().getModulePath(module->iModuleID) + "\" " + param->strParamNameL + " \"" + strApkPath  + "\" " ;
-            LOG(INFO) << "path =>" << CPubVar::GetInstance().getWorkPath().c_str() << endl;
+#else
+            strCmd = "\"" + CPubVar::GetInstance().getModulePath(module->iModuleID) + "\" " + param->strParamNameL + " \"" + strApkPath  + "\" " ;
+
+#endif
+            LOG(INFO) << "path =>  =>" << CPubVar::GetInstance().getWorkPath().c_str() << endl;
         }
         else if(module->iType == 3 )
         {
             strCmd = "java -jar \"" + CPubVar::GetInstance().getModulePath(module->iModuleID) + "\" " + param->strParamNameL ;
-            LOG(INFO) << "path =>" << CPubVar::GetInstance().getWorkPath().c_str() << endl;
         }
 
         paramModule->listParam.push_back(param);
@@ -394,7 +400,11 @@ int CManager::execCmd(int argc, char* argv[])
             else if(module->iType == 2)
             {
                 iCurr = 1;
+#ifdef I_OS_WINDOWS
                 strCmd = "\"" + CPubVar::GetInstance().getModulePath(module->iModuleID) + "\" " + strCmd;
+#else
+                strCmd = "\"" + CPubVar::GetInstance().getModulePath(module->iModuleID) + "\" " + strCmd;
+#endif
                 LOG(INFO) << "cmd = " << strCmd << endl;
             }
             else if(module->iType == 0 )
@@ -432,7 +442,6 @@ int CManager::execCmd(int argc, char* argv[])
         }
 
     }
-
     stTaskInfo->strApkPath = strApkPath;
 
     // 直接执行指令

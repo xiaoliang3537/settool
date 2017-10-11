@@ -24,6 +24,11 @@ using namespace  std;
 int main(int argc, char* argv[])
 {
     int iRet = 0;
+
+
+//    setuid(geteuid());
+//    setgid(getegid());
+
 #ifdef I_OS_WINDOWS
     setlocale(LC_ALL, "utf-8");
 #else
@@ -34,7 +39,7 @@ int main(int argc, char* argv[])
     manager.init();
     manager.execCmd(argc, argv);
 
-#ifdef I_OS_WINDOWS
+
 
 #else
 

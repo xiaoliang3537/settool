@@ -22,7 +22,7 @@ int CApkGeneral::initTask(ST_Task_Info* stTaskInfo, CPubVar* pubvar)
     iRet = CApk::initTask(stTaskInfo, pubvar);
     if(0 != iRet )
     {
-        LOG(ERROR) << "初始化失败" << endl;
+        LOG(ERROR) << tr("初始化失败") << endl;
         return iRet;
     }
     // 设置解压文件
@@ -47,8 +47,6 @@ int CApkGeneral::initTask(ST_Task_Info* stTaskInfo, CPubVar* pubvar)
 int CApkGeneral::doModule()
 {
     int iRet = 0;
-
-    LOG(INFO) << "this is CApkGeneral test " << endl ;
 
     if( m_iProcessType == 1 )        // 直接调用
     {
@@ -106,17 +104,21 @@ int CApkGeneral::doModule()
 
             // 调用模块处理
             string strOutPut;
-            string strparam = moduleParam->strListParam + "-f \"" + m_strTempPath + "\" -tf \"" + m_strConfigFile + "\"";
+            string strparam = moduleParam->strListParam + "-f \"" + m_strTempPath  + "\" -tf \"" + m_strConfigFile + "\"";
+//            string strparam = "java -jar \"" + CPubVar::GetInstance().getModulePath(module->iModuleID) + "\" -f \"" + m_strTempPath
+//                    + "\" " + "-nc";
 #ifdef _DEBUG
             LOG(INFO) << "strCmd = " << strparam << endl;
 #endif
-//            mysystem( strparam.c_str(), strOutPut);
-//            if(strOutPut.find( module->strCheck ) == -1 )
-//            {
-//                iRet = -1;
-//                LOG(ERROR) << tr("模块处理异常结束，未定位到成功标志 : ") << module->strCheck << endl;
-//                return iRet;
-//            }
+
+
+            mysystem( strparam.c_str(), strOutPut);
+            if(strOutPut.find( module->strCheck ) == -1 )
+            {
+                iRet = -1;
+                LOG(ERROR) << tr("模块处理异常结束，未定位到成功标志 : ") << module->strCheck << endl;
+                return iRet;
+            }
 
             // 清除中间数据
             m_listStDexFile.clear();
@@ -205,6 +207,45 @@ int CApkGeneral::setBackInfo()
             setAddFile( p.assign(m_strTempPath).append(_SYMBOL_PATH_).append(info->name),info->name );
         }
 #else
+        // 设置回编dex文件
+        I_FILE_TYPE* info = *it;
+
+        if(info->d_type &  DIR_ATTRIB /*_A_SUBDIR*/)
+        {
+            if(0 == strcmp(info->d_name, ".") || 0 == strcmp(info->d_name, "..") )
+                continue;
+
+            // 如果匹配到class文件夹 则为需要进行回编的dex文件， 否则为待压缩文件
+            if( NULL != strstr(info->d_name, "classes") )
+            {
+                std::string p;
+                std::string strFilePath;
+                std::string strFileName;
+                strFilePath.append(m_strTempPath).append(_SYMBOL_PATH_).append(info->d_name).append( ".dex" );
+                strFileName.append(info->d_name).append(".dex");
+
+                setBackSmaliFile(p.assign(m_strTempPath).append(_SYMBOL_PATH_).append(info->d_name), strFilePath );
+                setAddFile( p.assign(m_strTempPath).append(_SYMBOL_PATH_).append(info->d_name)+".dex", strFileName);
+            }
+            else
+            {
+                std::string p;
+                setDecompressDir( p.assign(m_strTempPath).append(_SYMBOL_PATH_).append(info->d_name),info->d_name );
+            }
+        }
+        else if(info->d_type & FILE_ATTRIB /*_A_ARCH*/ )
+        {
+            if(strlen(info->d_name) > 4 )
+            {
+                if( 0 == strcmp(info->d_name + strlen(info->d_name) - 4, ".dex") )
+                {
+                    continue;
+                }
+            }
+
+            std::string p;
+            setAddFile( p.assign(m_strTempPath).append(_SYMBOL_PATH_).append(info->d_name),info->d_name );
+        }
 #endif
     }
     return iRet;
