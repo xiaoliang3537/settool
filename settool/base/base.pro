@@ -1,6 +1,3 @@
-TEMPLATE = lib
-CONFIG   += staticlib
-
 CONFIG += console
 CONFIG -= app_bundle
 CONFIG -= qt
@@ -11,22 +8,55 @@ DEFINES -= UNICODE
 DEFINES += MARKUP_STL
 
 
+
 win32{
     DEFINES += I_OS_WINDOWS
+    DEFINES -= UNICODE
+    CONFIG += -static-runtime
+
+    CONFIG(debug, debug|release) {
+        DEFINES += _DEBUG
+        TARGET = settool_d
+        DESTDIR = $$PWD/../../evsubs
+        LIBS += -L$$PWD/../lib/debug -llibzip_d
+        LIBS += -L$$PWD/../lib/debug -lzlib_d
+        LIBS += -L$$PWD/../lib/debug -llibutils_d
+    }
+    else
+    {
+        TARGET = settool
+        DESTDIR = $$PWD/../../evsubs
+        LIBS += -L$$PWD/../lib/release -llibutils
+        LIBS += -L$$PWD/../lib/release -lzlib
+        LIBS += -L$$PWD/../lib/release -llibzip
+    }
+
 }
 else:unix{
     DEFINES += I_OS_LINUX
+    DEFINES += UTF-8
+    QMAKE_LFLAGS = -static -fPIC
+
+    CONFIG(debug, debug|release) {
+        DEFINES += _DEBUG
+        TARGET = settool_d
+        DESTDIR = $$PWD/../../evsubs
+        LIBS += -L$$PWD/../lib/debug -llibzip_d
+        LIBS += -L$$PWD/../lib/debug -lzlib_d
+        LIBS += -L$$PWD/../lib/debug -llibutils_d
+        LIBS += -ldl
+    }
+    else
+    {
+        TARGET = settool
+        DESTDIR = $$PWD/../../evsubs
+        LIBS += -L$$PWD/../lib/release -llibutils
+        LIBS += -L$$PWD/../lib/release -llibzip
+        LIBS += -L$$PWD/../lib/release -lzlib
+        LIBS += -ldl
+    }
 }
 
-debug {
-    DEFINES += _DEBUG
-    TARGET = base_d
-    DESTDIR = $$PWD/../lib/debug
-}
-else:release {
-    TARGET = base
-    DESTDIR = $$PWD/../lib/release
-}
 
 
 INCLUDEPATH += \
@@ -42,20 +72,18 @@ HEADERS += \
     header/library.h \
     header/list.h \
     header/manager.h \
-#    header/managerthread.h \
     header/Markup.h \
     header/pubfunc.h \
     header/pubvar.h \
     header/register.h \
     header/stringlist.h \
+    header/apkgeneral.h \
     zlib/zipfile.h \
     zlib/private.h \
     zlib/zip.h \
     zlib/ioapi.h \
     zlib/zlib.h \
     zlib/zconf.h \
-#    header/task.h \
-#    header/threadtask.h
     header/loger.h \
     include/3Des.h \
     include/CryptoDes.h \
@@ -67,6 +95,7 @@ HEADERS += \
     include/StringUtils.h \
     include/Utils.h
 
+
 SOURCES += \
     source/apk.cpp \
     source/config.cpp \
@@ -74,13 +103,12 @@ SOURCES += \
     source/library.cpp \
     source/list.cpp \
     source/manager.cpp \
-#    source/managerthread.cpp \
     source/Markup.cpp \
     source/pubfunc.cpp \
     source/pubvar.cpp \
     source/stringlist.cpp \
-#    source/task.cpp \
-#    source/threadtask.cpp
-    source/loger.cpp
+    source/loger.cpp \
+    source/main.cpp \
+    source/apkgeneral.cpp
 
 

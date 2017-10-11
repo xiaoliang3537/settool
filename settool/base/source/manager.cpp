@@ -10,10 +10,7 @@
 #include "library.h"
 #include "loger.h"
 
-
-#include "../general/apkgeneral.h"
-//#include "../ijmmodifydex/apkModifyDex.h"
-
+#include "apkgeneral.h"
 
 
 #ifdef I_OS_WINDOWS
@@ -631,13 +628,8 @@ CApk* CManager::loadModuleInner(int id)
     string strSymbol = module->strSymbol;
     CApk* apk = NULL;
     switch (module->iModuleID) {
-    case 101:
-    case 121:
-    case 123:
-    case 999:
-        apk = new CApkGeneral;
-        break;
     default:
+        apk = new CApkGeneral;
         break;
     }
 

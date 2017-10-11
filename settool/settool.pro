@@ -2,7 +2,7 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     base \
-    main \
+    #main \
     #ijmmodifydex
     #hijack \
 
