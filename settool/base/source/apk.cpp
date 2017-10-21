@@ -12,6 +12,7 @@ CApk::CApk()
 {
     m_bDecompressAll = false;
     m_pubvar = NULL;
+    m_zipFile = NULL;
     m_iProcessRet = -1;
     m_iProgramId = 0;
     m_iApkCount = 0;
@@ -24,22 +25,33 @@ CApk::CApk()
     m_mapDexToSmali.insert(pair<string,string>("classes3.dex", "smali_3"));
     m_mapDexToSmali.insert(pair<string,string>("classes4.dex", "smali_4"));
     m_mapDexToSmali.insert(pair<string,string>("classes5.dex", "smali_5"));
+    m_mapDexToSmali.insert(pair<string,string>("classes6.dex", "smali_6"));
+    m_mapDexToSmali.insert(pair<string,string>("classes7.dex", "smali_7"));
+    m_mapDexToSmali.insert(pair<string,string>("classes8.dex", "smali_8"));
+    m_mapDexToSmali.insert(pair<string,string>("classes9.dex", "smali_9"));
+
 
     m_mapSmaliToDex.insert(pair<string,string>("smali", "classes.dex"));
     m_mapSmaliToDex.insert(pair<string,string>("smali_2", "classes2.dex"));
     m_mapSmaliToDex.insert(pair<string,string>("smali_3", "classes3.dex"));
     m_mapSmaliToDex.insert(pair<string,string>("smali_4", "classes4.dex"));
     m_mapSmaliToDex.insert(pair<string,string>("smali_5", "classes5.dex"));
+    m_mapSmaliToDex.insert(pair<string,string>("smali_6", "classes6.dex"));
+    m_mapSmaliToDex.insert(pair<string,string>("smali_7", "classes7.dex"));
+    m_mapSmaliToDex.insert(pair<string,string>("smali_8", "classes8.dex"));
+    m_mapSmaliToDex.insert(pair<string,string>("smali_9", "classes9.dex"));
 
 }
 
 CApk::~CApk()
 {
-
+    if(NULL != m_zipFile)
+        clearZipFileInfo(m_zipFile);
 }
 
 int CApk::initTask(ST_Task_Info* stTaskInfo, CPubVar* pubvar )
 {
+    int iRet = 0;
     g_loger = pubvar->m_loger;
 
 #ifdef _DEBUG
@@ -113,7 +125,26 @@ int CApk::initTask(ST_Task_Info* stTaskInfo, CPubVar* pubvar )
     }
 
     // 设置解压文件
-    return 0;
+    // 压缩文件信息设置
+    m_zipFile = new Zipfile;
+    memset(m_zipFile, 0x0, sizeof(m_zipFile));
+    iRet = initApkFile(m_zipFile, m_strApkPath.c_str());
+    if (0 != iRet)
+    {
+        LOG(ERROR) << "init zip file error!" << endl;
+        return iRet;
+    }
+
+    ZipentryCenteral* entry_order_temp = m_zipFile->centeral;
+    do
+    {
+        std::string strName = (char*)entry_order_temp->fileName;
+        m_mapZipFileInfo.insert(pair<std::string,void*>(strName, (void*)entry_order_temp));
+        if(NULL == entry_order_temp->next )
+            break;
+        entry_order_temp = entry_order_temp->next;
+    }while(1);
+    return iRet;
 }
 
 int CApk::start()
@@ -168,7 +199,7 @@ int CApk::start()
                 return -4;
             }
             LOG(INFO) << tr("do end!") << endl;
-            iRet = doEnd();
+            //iRet = doEnd();
             if(0 != iRet )
             {
                 return -5;
@@ -325,7 +356,7 @@ int CApk::backPack()
     // 保留原包
     if(m_strTempApkPath.length() == 0 )
     {
-        m_strTempApkPath.append(FileUtils::ExtractFileRemoveExt(m_strApkPath)).append(m_strTempFilaName).append("_New.zip");
+        m_strTempApkPath.append(FileUtils::ExtractFileDir(m_strApkPath)).append(_SYMBOL_PATH_).append(m_strTempFilaName).append("_New.zip");
         LOG(INFO) << "temp apk path=" << m_strTempApkPath << endl;
     }
 
@@ -412,6 +443,9 @@ int CApk::backPack()
 
     iRet = 0;
     iter = m_listStAddFile.begin();
+
+    LOG(INFO) << "add file total length: " << m_listStAddFile.size() << endl;
+
     for(; iter != m_listStAddFile.end(); iter++)
     {
         // 进行压缩
@@ -419,7 +453,13 @@ int CApk::backPack()
 #ifdef _DEBUG
     LOG(INFO) << "add file to apk: " << info.strFilePath << "->" << info.strPathInZip << endl;
 #endif
-        iRet = addDataOrFileToZip(m_strTempApkPath.c_str(), info.strPathInZip.c_str(), info.strFilePath.c_str(), 0, bCreate );
+        void* pv = m_mapZipFileInfo[info.strPathInZip];
+        ZipentryCenteral* center = (ZipentryCenteral*)pv;
+        if(0 == info.strPathInZip.compare("assets/lua/System/Test.lua"))
+        {
+            int i = 0;
+        }
+        iRet = addDataOrFileToZip(m_strTempApkPath.c_str(), info.strPathInZip.c_str(), info.strFilePath.c_str(), 0, bCreate, NULL );
         bCreate = false;
 
         if(1 != iRet )
@@ -431,6 +471,7 @@ int CApk::backPack()
         }
     }
     // 压缩文件夹
+    LOG(INFO) << "add dir total length: " << m_listStDecompressDir.size() << endl;
     if( m_listStDecompressDir.size() > 0 )
     {
         list<ST_FIleAddInfo>::iterator iter2 = m_listStDecompressDir.begin();
@@ -465,6 +506,7 @@ int CApk::zipDeCompress()
     // 解压全部
     if(m_bDecompressAll)
     {
+        LOG(INFO) << "Decompression all file !" << endl;
         iRet = DecompressionZip(m_strTempPath.c_str(), m_strApkPath.c_str() );
         if(1 != iRet )
         {
@@ -491,9 +533,6 @@ int CApk::zipDeCompress()
             if( strFile.compare(strFile.length() - 4, 4, ".dex") == 0 )
             {
                 m_strListDex.append(strFile);
-#ifdef _DEBUG
-                LOG(INFO) << strFile << endl;
-#endif
             }
         }
     }
@@ -510,10 +549,8 @@ int CApk::zipDeCompress()
         }
         strFileList = strFileList.substr(0,strFileList.length()-1);
 
-        LOG(INFO) << "save path:" << m_strTempPath << endl;
-#ifdef _DEBUG
         LOG(INFO) << "decompress file:" << strFileList << endl;
-#endif
+
         // 解压文件
         iRet = DecompressionFilesEx(m_listStDecompressFile.size(), strFileList.c_str(), m_strTempPath.c_str(), m_strApkPath.c_str(), true);
         if(1 != iRet )
@@ -645,7 +682,17 @@ int CApk::setDecompressFile(string strFilePath, string strPathInZip)
     ST_FIleAddInfo st;
     st.strFilePath = strFilePath;
     st.strPathInZip = strPathInZip;
+
+    list<ST_FIleAddInfo>::iterator it = m_listStDecompressFile.begin();
+    for(; it != m_listStDecompressFile.end(); it++ )
+    {
+        ST_FIleAddInfo info = *it;
+        if(info.strPathInZip.compare(strPathInZip) == 0 )
+            return 0;
+    }
+
     this->m_listStDecompressFile.push_back(st);
+
     return iRet;
 }
 
@@ -655,6 +702,15 @@ int CApk::setDecompressDir(string strFilePath, string strPathInZip)
     ST_FIleAddInfo st;
     st.strFilePath = strFilePath;
     st.strPathInZip = strPathInZip;
+
+    list<ST_FIleAddInfo>::iterator it = m_listStDecompressDir.begin();
+    for(; it != m_listStDecompressDir.end(); it++ )
+    {
+        ST_FIleAddInfo info = *it;
+        if(info.strPathInZip.compare(strPathInZip) == 0 )
+            return 0;
+    }
+
     this->m_listStDecompressDir.push_back(st);
     return iRet;
 }
@@ -694,7 +750,7 @@ int CApk::checkOutPut(string &strOut, string su)
 
 
 // 获取目录下所有文件
-int CApk::getFileInDir(std::list<I_FILE_TYPE*> &listFileInfo)
+int CApk::getFileInDir(std::list<I_FILE_TYPE*> &listFileInfo, std::string strDir)
 {
     int iRet = 0;
 #ifdef I_OS_WINDOWS
@@ -703,7 +759,7 @@ int CApk::getFileInDir(std::list<I_FILE_TYPE*> &listFileInfo)
     //文件信息
     struct _finddata_t fileinfo;
     string p;
-    if((hFile = _findfirst(p.assign(m_strTempPath).append("\\*").c_str(),&fileinfo)) !=  -1)
+    if((hFile = _findfirst(p.assign(strDir).append("\\*").c_str(),&fileinfo)) !=  -1)
     {
         do
         {
@@ -721,7 +777,7 @@ int CApk::getFileInDir(std::list<I_FILE_TYPE*> &listFileInfo)
 #elif I_OS_LINUX
     DIR *dir;
     struct dirent *ptr;
-    if (( dir = opendir(m_strTempPath.c_str())) == NULL)
+    if (( dir = opendir(strDir.c_str())) == NULL)
     {
         LOG(ERROR) << "open dir fail " << m_strTempPath << endl;
         return -1;

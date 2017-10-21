@@ -11,7 +11,7 @@
 #include "loger.h"
 
 #include "apkgeneral.h"
-
+#include "Utils.h"
 
 #ifdef I_OS_WINDOWS
 #include <windows.h>
@@ -46,12 +46,7 @@ int CManager::init()
     g_loger->init();
     CPubVar::GetInstance().m_loger = g_loger;
     m_pubvar = &(CPubVar::GetInstance());
-//    // 加载功能模块
-//    QList<ST_Module*> listModule = m_pubvar->m_config->getModuleList();
-//    for(int i = 0; i < listModule.count() ;i++)
-//    {
-//        //this->loadModule(listModule.at(i)->iModuleID);
-//    }
+
     return iRet;
 }
 
@@ -185,6 +180,7 @@ int CManager::execCmd(int argc, char* argv[])
                     subParam->strParamName = sub->strParamName;
                     subParam->strParamNameL = sub->strParamNameL;
                     subParam->strParamDepend = sub->strParamDepend;
+                    subParam->strFileParam = sub->strFileParam;
 
                     if(sub->iValueNeed)
                     {
@@ -242,6 +238,8 @@ int CManager::execCmd(int argc, char* argv[])
         return 1;
     }
 
+    // 参数路径转换
+    strApkPath = abs_path(strApkPath.c_str());
 
     ST_Task_Info *stTaskInfo = new ST_Task_Info();
     stTaskInfo->strListParamCommon = strListParam;
@@ -362,7 +360,11 @@ int CManager::execCmd(int argc, char* argv[])
 
                             if( sub->strParamValue.length() != 0 )
                             {
-                                strCmd += " " + sub->strParamValue;
+                                if(sub->iParamValueType == 1)
+                                {
+                                    sub->strParamValue = abs_path(sub->strParamValue.c_str());
+                                }
+                                strCmd += " \"" + sub->strParamValue + "\"";
                             }
                         }
                     }
@@ -370,7 +372,12 @@ int CManager::execCmd(int argc, char* argv[])
                     {
                         if( param->strParamValue.length() != 0 )
                         {
-                            strCmd += " " + param->strParamValue;
+                            if(param->iParamValueType == 1)
+                            {
+                                param->strParamValue = abs_path(param->strParamValue.c_str());
+                            }
+                            //strCmd += " " + param->strParamValue;
+                            strCmd += " \"" + param->strParamValue + "\"";
                         }
                     }
                     strCmd += " ";

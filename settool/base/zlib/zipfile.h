@@ -109,8 +109,8 @@ int ZIPDecompression_ForMultiFile(const char *apkpath,const char * sTempDir,vect
  * @param bNewZip            if create new zip file
  * @return
  */
-EXPORT int addDataOrFileToZip(const char * pZipFilePath ,const char * pAddPathNameInZip,const char * pInFile,int iDataLen ,bool bNewZip = false);
-
+EXPORT int addDataOrFileToZip(const char * pZipFilePath ,const char * pAddPathNameInZip,const char * pInFile,int iDataLen
+                              ,bool bNewZip = false, ZipentryCenteral* center = NULL);
 /**
  * @brief addFilePathToZip  添加文件夹到zip文件 不解压原文件到磁盘
  * @param pZipFilePath      zip文件路径

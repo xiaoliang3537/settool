@@ -120,7 +120,7 @@ public:
     ModifyDex();
 
 public:
-    virtual int initTask(const char* strPath, const char * strConfig, int maxCount, int iCopyCount);
+    virtual int initTask(const char* strPath, const char * strConfig, int maxCount, int iCopyCount, const char* strMovePath);
     int doModule();
 
     bool ModifyApk(const char *pchApkName, unsigned int nMaxValue, int nCopytCount, bool bR);
@@ -159,6 +159,7 @@ private:
     int getFileInDir(std::list<I_FILE_TYPE*> &listFileInfo);
     int clearFileInfo(std::list<I_FILE_TYPE*> &listFileInfo);
 
+    std::string getWorkPath();
 private:
     std::string m_sTempFilePath;
     std::string m_sExecFilePath;
@@ -174,7 +175,10 @@ private:
     std::string m_strBackSmali;
     std::string m_strAxmlModify;
     std::string m_strTempPath;
+    std::string m_strWorkPath;
     std::list<I_FILE_TYPE*> m_listInfo;
+    // 入参文件列表
+    std::vector<std::string> m_vecDefFileS;
 };
 
 #endif // MODIFYDEX_H

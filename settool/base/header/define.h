@@ -33,13 +33,15 @@ struct ST_Module_Param_Sub
     ST_Module_Param_Sub()
     {
         iValueNeed = -1;
+        iParamValueType = 0;
     }
-
+    int                                 iParamValueType;            // 参数值类型 0 字符串 1 路径
     string                              strParamName;               // 参数名称
     string                              strParamNameL;              // 参数名称1 实际入参
     string                              strParamDesc;               // 参数描述
     string                              strParamValue;              // 参数值
     string                              strParamDepend;             // 依赖参数
+    string                              strFileParam;               // 保存需要解压的文件列表 支持通配符
     unsigned int                        iValueNeed;                 // 是否必须带参数
 };
 
@@ -49,17 +51,20 @@ struct ST_Module_Param
     ST_Module_Param()
     {
         bSubParam = false;
+        iParamValueType = 0;
         iDefault = -1;
         iModuleId = -1;
         iValueNeed = -1;
         iAttributes = -1;
     }
+    int                                 iParamValueType;            // 参数值类型 0 字符串 1 路径
     bool                                bSubParam;                  // 是否含有子参数
     string                              strParamName;               // 参数名称
     string                              strParamNameL;              // 参数名称1 实际入参
     string                              strParamDesc;               // 参数描述
     string                              strParamValue;              // 参数值
     string                              strParamDepend;             // 依赖参数
+    string                              strFileParam;               // 保存需要解压的文件列表 支持通配符
     list<ST_Module_Param_Sub*>          listSubParam;               // 子参数列表
     unsigned int                        iDefault;                   // 默认参数
     int                                 iModuleId;                  // 参数对应模块编号

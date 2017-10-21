@@ -17,10 +17,10 @@ ModifyDex::ModifyDex()
     m_sApkName.clear();
 }
 
-int ModifyDex::initTask(const char* strPath, const char * strConfig, int maxCount, int iCopyCount)
+int ModifyDex::initTask(const char* strPath, const char * strConfig, int maxCount, int iCopyCount, const char* strMovePath)
 {
     int iRet = 0;
-    if(NULL == strPath || NULL == strConfig )
+    if(NULL == strPath || NULL == strConfig || NULL == strMovePath )
     {
         return -1;
     }
@@ -29,7 +29,7 @@ int ModifyDex::initTask(const char* strPath, const char * strConfig, int maxCoun
     FILE* f = fopen(strConfig, "r+");
     if(NULL == f )
     {
-        LOG(INFO) << "config file open error !" << endl;
+        LOG(ERROR) << "config file open error !" << endl;
         return -1;
     }
     char temp[1024] ;
@@ -75,6 +75,59 @@ int ModifyDex::initTask(const char* strPath, const char * strConfig, int maxCoun
     }
     m_nMaxValue = maxCount;
     m_nCopytCount = iCopyCount;
+
+    // 设置需要排除的移动文件列表
+    do{
+        std::string path = strMovePath;
+        if(path.length() == 0 )
+        {
+#ifdef I_OS_WINDOWS
+            path = getWorkPath() + "\\nomove_activity0.ini" ;
+#else
+            path = getWorkPath() + "/nomove_activity0.ini";
+#endif
+            if(0 != access(path.c_str(), 0 ))
+            {
+                break;
+            }
+        }
+
+        FILE* f = fopen(path.c_str(), "r");
+        if(NULL == f )
+        {
+            fclose(f);
+            return -1;
+        }
+        fseek(f,0, SEEK_END);
+        int len = ftell(f);
+
+        if(len == 0 )
+        {
+            break;
+        }
+        fseek(f,0, SEEK_SET);
+        char buff[512] = {0};
+        while ( !feof(f) )
+        {
+            memset(buff, 0x0, 512 );
+            fgets(buff, 1024, f);
+            int iBuffLen = strlen(buff);
+
+            // 去掉结尾的换行符
+            if( iBuffLen == 0)
+                continue;
+            else
+            {
+                if( buff[iBuffLen-1] == '\n' )
+                    buff[iBuffLen-1] = '\0';
+            }
+            // 替换掉字符串里面的 .
+            ReplaceStr(buff, ".", "/");
+            m_vecDefFileS.push_back(buff);
+        }
+        fclose(f);
+    }while(0);
+
 //    iRet = CApk::initTask(stTaskInfo, pubvar);
 //    if(0 != iRet )
 //    {
@@ -640,7 +693,7 @@ bool ModifyDex::beginParseDex(OUT_MAX_DEXCOUNT vcDexFile, FILES_CACHE_LIST &vcOp
                 continue;
 
             // 如果匹配到class文件夹 则为需要进行回编的dex文件， 否则为待压缩文件
-            if( NULL != strstr(info->d_name, "classes") )
+            if( NULL != strstr(info->d_name, "smali") )
             {
                 std::string p;
                 std::string strFilePath;
@@ -963,7 +1016,7 @@ bool ModifyDex::FileSearch(std::string strFileName, FILES_CACHE_LIST &listFile_D
     strfile.append(m_sTempFilePath).append(_SYMBOL_PATH_).append(strFileName);
 
 #ifdef _DEBUG
-    LOG(INFO) << "search Dir info:" << strfile << " dex size :" << m_strListDex.length()  << std::endl;
+    LOG(INFO) << "search Dir info:" << strfile << " dex size :" << listFile_Dex.size()  << std::endl;
 #endif
 
     File_Handle = _findfirst(strfile.c_str(), &files);
@@ -1235,7 +1288,7 @@ bool ModifyDex::parseXmlActivity(std::string strMainActivity, FILES_CACHE_LIST &
         std::string strCmd = "", strOutput = "", strXmlPath = "";
         strXmlPath.append(m_sTempFilePath).append(_SYMBOL_PATH_)
                 .append("AndroidManifest.xml");
-        strTempXml.append(m_sExecFilePath).append(_SYMBOL_PATH_)
+        strTempXml.append(m_sTempFilePath).append(_SYMBOL_PATH_)
                 .append("AndroidManifestTemp.xml");
 
 //        strCmd.append("java -jar \"").append(m_pubvar->getAXMLPrinter2Path())
@@ -1425,6 +1478,31 @@ bool ModifyDex::parseXmlActivity(std::string strMainActivity, FILES_CACHE_LIST &
                 {
                     bSame = true;
                     break;
+                }
+            }
+
+            if(bSame)
+            {
+                continue;
+            }
+
+            // 查找默认的排除项
+            if(m_vecDefFileS.size() > 0)
+            {
+                for(vector<std::string>::iterator itDef = m_vecDefFileS.begin();
+                    itDef != m_vecDefFileS.end(); itDef++ )
+                {
+                    std::string strAct = "";
+                    strAct = *itDef;
+
+                    if(strcmp(strXml.c_str(), strAct.c_str()) == 0)
+                    {
+                        bSame = true;
+#ifdef _DEBUG
+                        LOG(INFO) << "no move file" << strAct << endl;
+#endif
+                        break;
+                    }
                 }
             }
 
@@ -2039,3 +2117,38 @@ int ModifyDex::clearFileInfo(std::list<I_FILE_TYPE*> &listFileInfo)
     return 0;
 }
 
+
+std::string ModifyDex::getWorkPath()
+{
+#ifdef I_OS_WINDOWS
+        TCHAR szPath[MAX_PATH];
+        if( !GetModuleFileName(NULL,szPath,MAX_PATH) )
+        {
+            printf("GetModuleFileName failed (%d)\n", GetLastError());
+            return "";
+        }
+        m_strWorkPath = szPath;
+        m_strWorkPath = FileUtils::ExtractFileDir(m_strWorkPath);
+#else
+        LOG(INFO) << "load readlink info" << endl;
+        char current_absolute_path[PATH_MAX] = {0};
+        int cnt = readlink("/proc/self/exe", current_absolute_path, PATH_MAX);
+        if (cnt < 0 || cnt >= PATH_MAX)
+        {
+            LOG(ERROR) << "get path fail" << endl;
+            exit(-1);
+        }
+        int i;
+        for (i = cnt; i >= 0; --i)
+        {
+            if (current_absolute_path[i] == '/')
+            {
+                current_absolute_path[i] = '\0';
+                break;
+            }
+        }
+        m_strWorkPath = current_absolute_path;
+        LOG(INFO) << "path = " << m_strWorkPath << endl;
+#endif
+        return m_strWorkPath;
+}

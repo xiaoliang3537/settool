@@ -68,14 +68,19 @@ int loadParam(int argc, char** argv, std::vector<ST_Param> &vec)
 
     if(argc == 2 )
     {
-        if(strcmp(argv[1],"-help") != 0 )
+        if(strcmp(argv[1],"-help") == 0  )
         {
-            cout  << "param abnormal! " << endl;
+            help();
+            return 1;
+        }
+        else if(strcmp(argv[1],"-v") == 0  || strcmp(argv[1],"-V") )
+        {
+            printVersion();
             return 1;
         }
         else
         {
-            help();
+            cout  << "param abnormal! " << endl;
             return 1;
         }
     }
@@ -96,7 +101,13 @@ int loadParam(int argc, char** argv, std::vector<ST_Param> &vec)
                 }
                 else
                 {
-                    return -1;
+                    if(strcmp("-mv", argv[i] ) == 0)
+                    {
+                        vec.push_back(stInfo);
+                        continue;
+                    }
+                    else
+                        return -1;
                 }
             }
         }
@@ -124,7 +135,7 @@ int main(int argc, char** argv)
     unsigned int nMaxValue = 0;
     unsigned int nCount = 0;
     std::string strMaxValue = "", strCount = "";
-
+    std::string strMovePath ;
     std::vector<ST_Param> vec;
     if(0 != loadParam(argc, argv, vec))
     {
@@ -152,6 +163,10 @@ int main(int argc, char** argv)
         if( 0 == st.strName.compare("-c") || 0 == st.strName.compare("-C") )
         {
             strCount = st.strValue;
+        }
+        if( 0 == st.strName.compare("-mv") || 0 == st.strName.compare("-MV") )
+        {
+            strMovePath = st.strValue;
         }
         if( 0 == st.strName.compare("-v") || 0 == st.strName.compare("-v") )
         {
@@ -252,12 +267,12 @@ int main(int argc, char** argv)
     }
 
 
-    //std::string strSrcFilePath = abs_path(pszApkPath.c_str());
+    std::string strSrcFilePath = abs_path(pszApkPath.c_str());
     std::cout << "full path is : " << pszApkPath << std::endl;
     std::cout << "-n parameter is : " << strMaxValue << std::endl;
     std::cout << "-c parameter is : " << strCount << std::endl;
 
-    ojbModify.initTask(pszApkPath.c_str(),strConfig.c_str(), nMaxValue, nCount);
+    ojbModify.initTask(pszApkPath.c_str(),strConfig.c_str(), nMaxValue, nCount, strMovePath.c_str() );
     bBackUp = ojbModify.doModule();
 
     if (0 != bBackUp)

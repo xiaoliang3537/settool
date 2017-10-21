@@ -35,6 +35,8 @@
 #define I_FILE_TYPE dirent
 #endif
 
+struct Zipfile;
+
 extern loger *g_loger;
 
 using namespace std;
@@ -161,7 +163,7 @@ protected:
     int backSmali();
     bool checkFileExsit(const char* file);
     // 获取目录下所有文件
-    int getFileInDir(std::list<I_FILE_TYPE*> &listFileInfo);
+    int getFileInDir(std::list<I_FILE_TYPE*> &listFileInfo, std::string strDir);
     int clearFileInfo(std::list<I_FILE_TYPE*> &listFileInfo);
 protected:
     // 解压 压缩文件列表设置
@@ -196,6 +198,7 @@ protected:
     CStringList                                 m_strListAdd;               // 新增文件列表
     ST_Module*                                  m_stModuleInfo;             // 模块信息
     ST_Task_Info*                               m_stTaskInfo;               // 任务信息
+    Zipfile*                                    m_zipFile;                  // zip文件信息
 protected:
     typedef struct
     {
@@ -210,6 +213,7 @@ protected:
 
     std::map<std::string, std::string>          m_mapDexToSmali;            // 反编译文件目录
     std::map<std::string, std::string>          m_mapSmaliToDex;            // 反编译文件目录
+    std::map<std::string, void*>                m_mapZipFileInfo;           // 压缩文件信息
 };
 
 #endif      // APK_H

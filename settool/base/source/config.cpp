@@ -87,10 +87,12 @@ int CConfig::loadConfig()
             module->strToolName = objXml.GetAttrib("toolname");
             module->strHelp = objXml.GetAttrib("help");
             module->strCheck = objXml.GetAttrib("check");
+            module->strVersion = objXml.GetAttrib("version");
             if(module->strCheck.length() == 0 )
             {
                 module->strCheck = "sucess";
             }
+
             objXml.IntoElem();
             while(1)
             {
@@ -108,6 +110,9 @@ int CConfig::loadConfig()
                 stparam->iDefault = atoi( objXml.GetAttrib("default").c_str() );
                 stparam->iAttributes = atoi( objXml.GetAttrib("attributes").c_str() );
                 stparam->strParamDepend = objXml.GetAttrib("depend").c_str();
+                // 参数类型
+                stparam->iParamValueType = atoi(objXml.GetAttrib("valuetype").c_str()) ;
+                stparam->strFileParam = objXml.GetAttrib("file");
                 if( objXml.IntoElem() )
                 {
                     while(1)
@@ -125,7 +130,9 @@ int CConfig::loadConfig()
                         sub->iValueNeed = atoi( objXml.GetAttrib("valueneed").c_str() );
                         sub->strParamDesc = objXml.GetAttrib("desc");
                         sub->strParamDepend = objXml.GetAttrib("depend");
-
+                        // 参数类型
+                        sub->iParamValueType = atoi(objXml.GetAttrib("valuetype").c_str()) ;
+                        sub->strFileParam = objXml.GetAttrib("file");
                         stparam->listSubParam.push_back(sub);
                     }
                 }
@@ -232,7 +239,7 @@ int CConfig::showHelp()
         if(module->iAvailable == 1 )
         {
 #ifdef I_OS_WINDOWS
-            cout << CPubfunc::KS_UTF8_to_ANSI(module->strModuleName.c_str()) << tr(" param list") << endl;
+            cout << CPubfunc::KS_UTF8_to_ANSI(module->strModuleName.c_str()) << tr(" version:") << module->strVersion << endl;
 #else
             cout << module->strModuleName.c_str() << tr("param list") << endl;
 #endif

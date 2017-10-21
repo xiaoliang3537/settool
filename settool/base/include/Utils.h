@@ -4,10 +4,14 @@
 #include <stdlib.h>
 #include <iostream>
 #include <string.h>
-#ifdef I_OS_WINDOWS
-#include <windows.h>
+#include "FileUtils.h"
+
+#ifdef _WIN32
+#include <Windows.h>
 #else
+#include <unistd.h>
 #endif
+
 /*****************************************************************************
 * arg_to_int - Convert argument string to integer.
 *
@@ -16,6 +20,21 @@
 * defalt - The default value, in case of an error.
 * opt - Option string of this argument.  (ex., "-h");
 */
+
+inline static void strTrim(char*pStr)
+{
+    char *pTmp = pStr;
+
+    while (*pStr != '/0')
+    {
+        if (*pStr != ' ')
+        {
+            *pTmp++ = *pStr;
+        }
+        ++pStr;
+    }
+    *pTmp = '/0';
+}
 
 inline int arg_to_int(const char* arg, int min, int max, int defalt, const char* opt)
 {
@@ -245,6 +264,63 @@ inline bool  WindowsExec(const char* cmdline, bool uCmdShow)
     return false;
 #endif
 }
+
+#define MAX_BUFFER  2048
+inline static std::string abs_path(const char* srcpath)
+{
+    std::string strAbsolutionpath = "";
+    char abspath[MAX_BUFFER] = {0};
+#ifdef _WIN32
+    if(_fullpath(abspath, srcpath, MAX_BUFFER) != NULL)
+    {
+        if(strstr(srcpath, abspath))
+            strAbsolutionpath.append(srcpath);
+        else
+            strAbsolutionpath.append(abspath, strlen(abspath));
+    }
+    else
+    {
+        printf("invalid path!\n");
+    }
+#else
+    if( *srcpath == '/' )
+    {
+        return srcpath;
+    }
+
+    if(getcwd(abspath, MAX_BUFFER) != NULL)
+    {
+        char pszfull[MAX_BUFFER] = {0};
+        memcpy(pszfull, abspath, strlen(abspath));
+
+        int index = 0;
+        char sz[1024] = {0};
+
+        if( *(srcpath+0) == '.' && *(srcpath+1) == '.' )
+        {
+            sprintf(sz, "%s/%s", pszfull, srcpath );
+            strAbsolutionpath.append(sz);
+        }
+        else
+        {
+            if( *(srcpath+0) == '.' && *(srcpath+1) == '/')
+            {
+                index = 2;
+            }
+            sprintf(sz, "%s/%s", pszfull, srcpath + index );
+            strAbsolutionpath.append(sz);
+        }
+    }
+    else
+    {
+        printf("invailed path!\n");
+    }
+
+#endif
+    return strAbsolutionpath;
+}
+
+
 
 //inline bool  WindowsExec(char* cmdline, bool uCmdShow,char * lpOutfile)
 //{

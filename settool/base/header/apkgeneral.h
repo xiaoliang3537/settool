@@ -21,13 +21,16 @@ protected:
 private:
     int setBackInfo();
     int writeToFile(std::string &strFileName, CStringList &strList);
+
+    // 获取目录下所有文件列表，不包括文件夹
+    int getFileList(std::string &strdir, std::vector<std::string> &vecFile);
 private:
     std::string m_strConfigFile;
     CStringList m_strList;
     std::list<I_FILE_TYPE*> m_listFileInfo;
 };
 
-// 瀵煎嚭鍑芥暟澹版槑
+// 导出函数声明
 //EXPORT_DEF(CApkGeneral)
 //{
 //    return (void*)(new CApkGeneral);

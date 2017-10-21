@@ -14,58 +14,21 @@
 	general 通用参数标识 不进行模块识别
 	valueneed 参数标识时候必须要带输入值 0 不需要 1 需要
 	attributes 参数属性 0 通用参数 1 专用参数 不指定 为0
+	valuetype 参数值类型 0 字符串 1 路径参数
 	depend 依赖参数
 	zpfi infi hifi fifi
+	file 对应需要解压的文件 多个文件用 ; 进行分割 支持通配符
 	路径问题要注意windows \\ 下 linux 下 /
 -->
 
 <resources>
 	<module id="1" name="zip工具" symbol="myzip" type="2" available="1" help="" toolname="bin\myzip">
-		<param name="-zpfa" name1 = "-a" attributes = "1" valueneed = "1" default="0" desc="添加文件" />
-		<param name="-zpfr" name1 = "-r" attributes = "1" valueneed = "1" default="0" desc="删除文件" />
-		<param name="-zpzx" name1 = "-e" attributes = "1" valueneed = "1" default="0" desc="解压缩所有文件" />
-		<param name="-zpzf" name1 = "-s" attributes = "1" valueneed = "1" default="0" desc="解压指定文件" />
-		<param name="-zpzd" name1 = "-y" attributes = "1" valueneed = "1" default="0" desc="解压指定目录" />
-		<param name="-zpcd" name1 = "-c" attributes = "1" valueneed = "1" default="0" desc="压缩目录" />
-		<param name="-fifi" name1 = "-z" attributes = "1" valueneed = "1" default="0" desc="传入包文件" />
-		<param name="-zpff" name1 = "-f" attributes = "1" valueneed = "1" default="0" desc="传入文件路径" />
-		<param name="-zpfd" name1 = "-d" attributes = "1" valueneed = "0" default="0" desc="配合-zpff指定文件是否为目录" />
-		<param name="-zpfp" name1 = "-p" attributes = "1" valueneed = "1" default="0" desc="指定包中文件路径" />
-		<param name="-zpfo" name1 = "-o" attributes = "1" valueneed = "0" default="0" desc="输出目录" />
-		<param name="-zpdc" name1 = "-x" attributes = "1" valueneed = "0" default="0" desc="是否压缩目录进zip，默认不压缩" />
 	</module>
-	<module id="2" name="xml打印工具" symbol="AXMLPrinter2" type="1" available="2" help="" toolname="bin\AXMLPrinter2">
+	<module id="2" name="xml打印工具" symbol="AXMLPrinter2" type="1" available="0" help="" toolname="bin\AXMLPrinter2">
 	</module>	
 	<module id="44" name="smali编译工具" symbol="smali-2.1.0" type="1" available="0" help="" toolname="bin\smali-2.1.0">
-		<param name="-axsa" name1 ="-a" attributes = "1" valueneed = "0" default="0" desc="api别级" />
-		<param name="-axsf" name1 ="-f" attributes = "1" valueneed = "0" default="0" desc="" />
-		<param name="-axsm" name1 ="-m" attributes = "0" valueneed = "1" default="0" desc="" />
-		<param name="-axso" name1 ="-o" attributes = "0" valueneed = "1" default="0" desc="" />
-		<param name="-axst" name1 ="-t" attributes = "0" valueneed = "1" default="0" desc="" />
-		<param name="-axsv" name1 ="-v" attributes = "0" valueneed = "1" default="0" desc="" />
-		<param name="-axsX" name1 ="-X" attributes = "0" valueneed = "1" default="0" desc="" />
-		<param name="-axsx" name1 ="-x" attributes = "0" valueneed = "1" default="0" desc="" />
 	</module>
 	<module id="33" name="smali反编译工具" symbol="baksmali-2.1.0" type="1" available="0" help="" toolname="bin\baksmali-2.1.0">
-		<param name="-smaa" name1 = "-a" attributes = "1" valueneed = "0" default="0" desc="输入文件" />
-		<param name="-smab" name1 = "-b" attributes = "1" valueneed = "0" default="0" desc="文件路径" />
-		<param name="-smad" name1 = "-d" attributes = "0" valueneed = "1" default="0" desc="" />
-		<param name="-smae" name1 = "-e" attributes = "0" valueneed = "1" default="0" desc="" />
-		<param name="-smaf" name1 = "-f" attributes = "0" valueneed = "1" default="0" desc="" />
-		<param name="-smai" name1 = "-i" attributes = "0" valueneed = "1" default="0" desc="" />
-		<param name="-smaj" name1 = "-j" attributes = "0" valueneed = "1" default="0" desc="" />
-		<param name="-smak" name1 = "-k" attributes = "0" valueneed = "1" default="0" desc="" />
-		<param name="-smal" name1 = "-l" attributes = "0" valueneed = "1" default="0" desc="" />
-		<param name="-smam" name1 = "-m" attributes = "0" valueneed = "1" default="0" desc="" />
-		<param name="-sman" name1 = "-n" attributes = "0" valueneed = "1" default="0" desc="" />
-		<param name="-smao" name1 = "-o" attributes = "0" valueneed = "1" default="0" desc="" />
-		<param name="-smap" name1 = "-p" attributes = "0" valueneed = "1" default="0" desc="" />
-		<param name="-smar" name1 = "-r" attributes = "0" valueneed = "1" default="0" desc="" />
-		<param name="-smas" name1 = "-s" attributes = "0" valueneed = "1" default="0" desc="" />
-		<param name="-smat" name1 = "-t" attributes = "0" valueneed = "1" default="0" desc="" />
-		<param name="-smav" name1 = "-v" attributes = "0" valueneed = "1" default="0" desc="" />
-		<param name="-smaX" name1 = "-X" attributes = "0" valueneed = "1" default="0" desc="" />
-		<param name="-smax" name1 = "-x" attributes = "0" valueneed = "1" default="0" desc="" />
 	</module>
 	<module id="6" name="xml修改工具" symbol="AxmlModify" type="2" available="2" help="" toolname="bin\AxmlModify">
 	</module>	
@@ -75,41 +38,17 @@
 	</module>	
 	<module id="3" name="smali编译工具" symbol="smali2" type="1" available="2" help="" toolname="bin\smali-2.1.3">
 	</module>
+	<module id="51" name="密钥和证书管理工具" symbol="keytool" type="2" available="0" version="5.0.1" check="ENCRYPTION SUCCESS" toolname="keytool" help="" >
+	</module>
 	<module id="101" name="防截屏防劫持" symbol="CApkGeneral" type="3" available="1" help="" version="5.0.1" check="ENCRYPTION SUCCESS" toolname="module\Integration\Integration" >
 		<param name="-fifi" name1 ="" attributes = "0" valueneed = "1" default="0" desc="文件路径" />
 		<param name="-injp" name1 ="-jp" attributes = "1" valueneed = "0" desc="防截屏" />
 		<param name="-inmn" name1 ="-mn" attributes = "1" valueneed = "0" desc="防模拟" />
 		<param name="-injc" name1 ="-jc" attributes = "1"  valueneed = "0" desc="劫持提醒" />
-		<param name="-inyc" name1 ="-yc" attributes = "1"  valueneed = "0" desc="异常报错" />
-		<param name="-incf" name1 ="-cf" attributes = "1"  valueneed = "1" desc="防截屏指定配置文件" />
-		<param name="-injm" name1 ="-bdjm" attributes = "1"  valueneed = "0" desc="本地数据加密" />
-		<param name="-intn" name1 ="-n" attributes = "1"  valueneed = "0" desc="是否创建新dex文件" />
-		<param name="-intd" name1 ="-d" attributes = "1"  valueneed = "0" desc="是否删除签名" />
+		<param name="-incf" name1 ="-cf" attributes = "1" valuetype = "1" valueneed = "1" desc="防截屏指定配置文件" />
+		<param name="-hfdz" name1 ="-custom" attributes = "1" valuetype = "1" valueneed = "1" desc="恒丰定制" />
 	</module>
-	<module id="110" name="密钥和证书管理工具" symbol="keytool" type="2" available="1" version="5.0.1" check="ENCRYPTION SUCCESS" toolname="keytool" help="" >
-		<param name="-kcer" name1 = "-certreq " attributes = "1" valueneed = "1" default="0" desc="生成证书请求" />
-		<param name="-kcha" name1 = "-changealias" attributes = "1" valueneed = "1" default="0" desc="更改条目的别名" />
-		<param name="-kdel" name1 = "-delete" attributes = "1" valueneed = "1" default="0" desc="删除条目" />
-		<param name="-kexp" name1 = "-exportcert" attributes = "1" valueneed = "1" default="0" desc="导出证书" />
-		<param name="-kgen" name1 = "-genkeypair" attributes = "1" valueneed = "1" default="0" desc="生成密钥对" />
-		<param name="-kges" name1 = "-genseckey" attributes = "1" valueneed = "1" default="0" desc="生成密钥" />
-		<param name="-kgec" name1 = "-gencert" attributes = "1" valueneed = "1" default="0" desc="根据证书请求生成证书" />
-		<param name="-kimp" name1 = "-importcert" attributes = "1" valueneed = "1" default="0" desc="导入证书或证书链" />
-		<param name="-kimo" name1 = "-importkeystore" attributes = "1" valueneed = "1" default="0" desc="从其他密钥库导入一个或所有条目" />
-		<param name="-keyp" name1 = "-keypasswd" attributes = "1" valueneed = "1" default="0" desc="更改条目的密钥口令" />
-		<param name="-klis" name1 = "-list" attributes = "1" valueneed = "1" default="0" desc="列出密钥库中的条目" />
-		<param name="-kpri" name1 = "-printcert" attributes = "1" valueneed = "1" default="0" desc="打印证书内容" />
-		<param name="-kprn" name1 = "-printcertreq" attributes = "1" valueneed = "1" default="0" desc="打印证书请求的内容" />
-		<param name="-kprt" name1 = "-printcrl" attributes = "1" valueneed = "1" default="0" desc="打印 CRL 文件的内容" />
-		<param name="-ksto" name1 = "-storepasswd" attributes = "1" valueneed = "1" default="0" desc="更改密钥库的存储口令" />
-	</module>
-	<module id="120" name="测试工具" symbol="CApkHijack" type="0" available="1" version="5.0.1" check="ENCRYPTION SUCCESS" toolname="module\CApkHijack" help="" >
-		<param name="-fifi" name1 ="" attributes = "0" valueneed = "1" default="0" desc="输入APK包" />
-		<param name="-jr" name1 ="" attributes = "1" valueneed = "0" default="0" desc="test2" />
-		<param name="-js" name1 ="" attributes = "1" valueneed = "0" default="0" desc="test3" />
-		<param name="-jv" name1 ="" attributes = "1" valueneed = "0" default="0" desc="test4" />
-	</module>
-	<module id="121" name="资源隐藏工具" symbol="CApkGeneral" type="1" available="1" version="5.0.1" check="ENCRYPTION SUCCESS" toolname="module\ResTool\HideApkResNew" help="" >
+	<module id="121" name="资源隐藏工具" symbol="CApkGeneral" type="1" available="0" version="5.0.1" check="ENCRYPTION SUCCESS" toolname="module\ResTool\HideApkResNew" help="" >
 		<param name="-hifi" name1 ="-i" attributes = "1" valueneed = "1" default="0" desc="输入apk文件" />
 		<param name="-hifc" name1 ="-f" attributes = "1" valueneed = "1" default="0" desc="配置文件" />
 		<param name="-hisi" name1 ="-s" attributes = "1" valueneed = "0" default="0" desc="是否签名" />
@@ -117,29 +56,32 @@
 	<module id="123" name="游戏内存加密工具" symbol="CApkGeneral" type="3" available="1" toolname="module\GameIntegration\GameIntegration" version=" V3.0.1.1" check="ENCRYPTION SUCCESS" help="TestShared.apk -nc -dll Assembly-CSharp-firstpass.dll;Assembly-CSharp.dll -lua lua.txt"  >
 		<param name="-fifi" name1 ="" attributes = "1" valueneed = "1" default="0" desc="输入apk文件" />
 		<param name="-ganc" name1 ="-mem" attributes = "1" valueneed = "1" default="0" desc="内存加密" >
-			<subparam name="1" name1 ="1" attributes = "1" valueneed = "0" default="0" desc="apk包加密" />
-			<subparam name="2" name1 ="2" attributes = "1" valueneed = "0" default="0" desc="so文件加密" />
+			<subparam name="1" name1 ="1" attributes = "1" valueneed = "0" file="*.so" default="0" desc="so加密" />
+			<subparam name="2" name1 ="2" attributes = "1" valueneed = "0" file="*" default="0" desc="更新包so加密" />
 			<subparam name="3" name1 ="3" attributes = "1" valueneed = "0" depend = "-gaso" default="0" desc="指定so文件进行加密" />
 		</param>
-		<param name="-gaso" name1 ="-soname" attributes = "1" valueneed = "1" default="0" desc="so 文件路径 配合 -ganc 3 使用" />
-		<param name="-glua" name1 ="-lua" attributes = "1" valueneed = "1" default="0" desc="更新包lua加密" >
-			<subparam name="1" name1 ="1" attributes = "1" valueneed = "0" depend = "-gluapath" default="0" desc="apk包加密" />
-			<subparam name="2" name1 ="2" attributes = "1" valueneed = "0" depend = "-gluapath" default="0" desc="更新包lua加密" />
+		<param name="-gaso" name1 ="-soname" attributes = "1" valueneed = "1" valuetype = "0" default="0" desc="so 文件路径 配合 -ganc 3 使用" />
+		<param name="-glua" name1 ="-lua" attributes = "1" valueneed = "1" file="*.lua" default="0" desc="更新包lua加密" >
+			<subparam name="1" name1 ="1" attributes = "1" valueneed = "0" depend = "-gluapath" default="0" desc="apk包lua加密" />
+			<subparam name="2" name1 ="2" attributes = "1" valueneed = "0" depend = "-gluapath" file="*" default="0" desc="更新包lua加密" />
 		</param>
-		<param name="-gluapath" name1 ="-luapath" attributes = "1" valueneed = "1" default="0" desc="配合-glua参数指明lua配置路径" />
-		<param name="-gdll" name1 ="-dll" attributes = "1" valueneed = "1" default="0" desc="更新包dll加密" >
+		<param name="-gluapath" name1 ="-luapath" attributes = "1" valueneed = "1"  default="0" desc="配合-glua参数指明lua配置路径" />
+		<param name="-gdll" name1 ="-dll" attributes = "1" valueneed = "1" file="" default="0" desc="更新包dll加密" >
 			<subparam name="1" name1 ="1" attributes = "1" valueneed = "0" depend = "-gdllpath" default="0" desc="老版本dll加密" />
 			<subparam name="2" name1 ="2" attributes = "1" valueneed = "0" depend = "-gdllpath" default="0" desc="新版本dll加密" />
-			<subparam name="3" name1 ="3" attributes = "1" valueneed = "0" depend = "-gdllpath" default="0" desc="apk包加密" />
-			<subparam name="4" name1 ="4" attributes = "1" valueneed = "0" depend = "-gdllpath" default="0" desc="更新包dll加密" />
+			<subparam name="3" name1 ="3" attributes = "1" valueneed = "0" depend = "-gdllpath" default="0" desc="加强版dll加密" />
+			<subparam name="4" name1 ="4" attributes = "1" valueneed = "0" depend = "-gdllpath" file="*" default="0" desc="更新包dll加密" />
 		</param>
-		<param name="-gdllpath" name1 ="-dllnames" attributes = "1" valueneed = "1" default="0" desc="配合-gdll参数指明dll配置路径" />
+		<param name="-gdllpath" name1 ="-dllnames" attributes = "1" valuetype = "0"  valueneed = "1" default="0" desc="配合-gdll参数指明dll配置路径" />
 	</module>
-	<module id="999" name="拆包工具" symbol="ModifyDex" type="2" available="1" toolname="module\Modifydex\IJMModifydex" version="5.0.1" check="ENCRYPTION SUCCESS" help=""  >
+	<module id="124" name="资源隐藏工具" symbol="HideApkResNew" type="3" available="1" help="" version="5.0.1" check="ENCRYPTION SUCCESS" toolname="module\ApkRes\HideApkResNew" >
+		<param name="-fifi" name1 ="-f" attributes = "0" valueneed = "1" default="0" desc="输入apk文件" />
+		<param name="-hicf" name1 ="-i" attributes = "1" valueneed = "1" valuetype = "1" default="0" desc="配置文件路径" />
+	</module>
+	<module id="999" name="拆包工具" symbol="ModifyDex" type="2" available="1" toolname="module\Modifydex\IJMModifydex" version="3.3" check="ENCRYPTION SUCCESS" help=""  >
 		<param name="-fifi" name1 ="-f" attributes = "1" valueneed = "1" default="0" desc="输入apk文件" />
-		<param name="-mofn" name1 ="-n" attributes = "1" valueneed = "1" default="0" desc="" />
-		<param name="-mofc" name1 ="-c" attributes = "1" valueneed = "0" default="0" desc="" />
-		<param name="-mofr" name1 ="-r" attributes = "1" valueneed = "0" default="0" desc="" />
-		<param name="-mofv" name1 ="-v" attributes = "1" valueneed = "0" default="0" desc="" />
+		<param name="-mofn" name1 ="-n" attributes = "1" valueneed = "1" default="0" desc="拆分文件数量" />
+		<param name="-mofc" name1 ="-c" attributes = "1" valueneed = "0" default="0" desc="移动文件数量" />
+		<param name="-nomv" name1 ="-momv" attributes = "1" valueneed = "0" default="0" desc="不做移动文件列表" />
 	</module>
 </resources>
