@@ -7,6 +7,8 @@
 #include "stringlist.h"
 #include "zipfile.h"
 
+#include "Utils.h"
+
 #ifdef WIN32
 # ifndef I_OS_WINDOWS
 # define I_OS_WINDOWS
@@ -36,6 +38,7 @@ int main(int argc, char* argv[])
     CManager manager;
     manager.init();
     manager.execCmd(argc, argv);
+
 
 
     return iRet;

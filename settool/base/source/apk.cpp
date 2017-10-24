@@ -450,16 +450,18 @@ int CApk::backPack()
     {
         // 进行压缩
         ST_FIleAddInfo info = *iter;
-#ifdef _DEBUG
+//#ifdef _DEBUG
     LOG(INFO) << "add file to apk: " << info.strFilePath << "->" << info.strPathInZip << endl;
+//#endif
+
+#ifdef I_OS_WINDOWS
+        std::string strIn = info.strPathInZip;
+        info.strPathInZip = FileUtils::BslToSl(strIn);
 #endif
+
         void* pv = m_mapZipFileInfo[info.strPathInZip];
         ZipentryCenteral* center = (ZipentryCenteral*)pv;
-        if(0 == info.strPathInZip.compare("assets/lua/System/Test.lua"))
-        {
-            int i = 0;
-        }
-        iRet = addDataOrFileToZip(m_strTempApkPath.c_str(), info.strPathInZip.c_str(), info.strFilePath.c_str(), 0, bCreate, NULL );
+        iRet = addDataOrFileToZip(m_strTempApkPath.c_str(), info.strPathInZip.c_str(), info.strFilePath.c_str(), 0, bCreate, center );
         bCreate = false;
 
         if(1 != iRet )
@@ -491,10 +493,7 @@ int CApk::backPack()
             }
         }
     }
-    iRet = 0;
-    // 如果流程正确 则将缓存包替换原包
-
-    return iRet;
+    return 0;
 }
 
 

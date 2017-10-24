@@ -198,9 +198,9 @@ int CApkGeneral::doModule()
             // 调用模块处理
             string strOutPut;
             string strparam = moduleParam->strListParam + "-f \"" + m_strTempPath  + "\" -tf \"" + m_strConfigFile + "\"";
-#ifdef _DEBUG
+//#ifdef _DEBUG
             LOG(INFO) << "strCmd = " << strparam << endl;
-#endif
+//#endif
 
 
             mysystem( strparam.c_str(), strOutPut);

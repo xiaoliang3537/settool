@@ -47,13 +47,9 @@
 		<param name="-injc" name1 ="-jc" attributes = "1"  valueneed = "0" desc="劫持提醒" />
 		<param name="-incf" name1 ="-cf" attributes = "1" valuetype = "1" valueneed = "1" desc="防截屏指定配置文件" />
 		<param name="-hfdz" name1 ="-custom" attributes = "1" valuetype = "1" valueneed = "1" desc="恒丰定制" />
+		<param name="-winfocus" name1 ="-winfocus" attributes = "1" valuetype = "1" valueneed = "0" desc="防劫持添加'onwindowfocuschanged'方法." />
 	</module>
-	<module id="121" name="资源隐藏工具" symbol="CApkGeneral" type="1" available="0" version="5.0.1" check="ENCRYPTION SUCCESS" toolname="module\ResTool\HideApkResNew" help="" >
-		<param name="-hifi" name1 ="-i" attributes = "1" valueneed = "1" default="0" desc="输入apk文件" />
-		<param name="-hifc" name1 ="-f" attributes = "1" valueneed = "1" default="0" desc="配置文件" />
-		<param name="-hisi" name1 ="-s" attributes = "1" valueneed = "0" default="0" desc="是否签名" />
-	</module>
-	<module id="123" name="游戏内存加密工具" symbol="CApkGeneral" type="3" available="1" toolname="module\GameIntegration\GameIntegration" version=" V3.0.1.1" check="ENCRYPTION SUCCESS" help="TestShared.apk -nc -dll Assembly-CSharp-firstpass.dll;Assembly-CSharp.dll -lua lua.txt"  >
+	<module id="123" name="游戏内存加密工具" symbol="CApkGeneral" type="3" available="1" toolname="module\GameIntegration\GameIntegration" version=" V04.17.10.18" check="ENCRYPTION SUCCESS" help="TestShared.apk -nc -dll Assembly-CSharp-firstpass.dll;Assembly-CSharp.dll -lua lua.txt"  >
 		<param name="-fifi" name1 ="" attributes = "1" valueneed = "1" default="0" desc="输入apk文件" />
 		<param name="-ganc" name1 ="-mem" attributes = "1" valueneed = "1" default="0" desc="内存加密" >
 			<subparam name="1" name1 ="1" attributes = "1" valueneed = "0" file="*.so" default="0" desc="so加密" />
